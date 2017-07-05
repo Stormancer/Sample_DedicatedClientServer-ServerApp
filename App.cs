@@ -11,6 +11,7 @@ using Newtonsoft.Json.Linq;
 using Server.Plugins.Configuration;
 using Server.Plugins.GameSession;
 using DedicatedSample;
+using Server.Users;
 
 namespace Server
 {
@@ -38,8 +39,13 @@ namespace Server
                 scene.AddGameSession();
             });
 
+            var userConfig = new Users.UserManagementConfig() { SceneIdRedirect = "services" /*Constants.MATCHMAKER_NAME*/ };
+            //userConfig.AuthenticationProviders.Add(new LoginPasswordAuthenticationProvider());
+            userConfig.AuthenticationProviders.Add(new SteamAuthenticationProvider());
+            //userConfig.AuthenticationProviders.Add(new AdminImpersonationAuthenticationProvider());
 
-           
+            builder.AddPlugin(new UsersManagementPlugin(userConfig));
+
         }
     }
 }
