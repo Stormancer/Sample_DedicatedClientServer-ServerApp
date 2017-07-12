@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DedicatedSample
 {
-    class LocatorController : ControllerBase
+    public class LocatorController : ControllerBase
     {
         private readonly ManagementClientAccessor _management;
         public const string SHARD_ID = "sample-shard";
