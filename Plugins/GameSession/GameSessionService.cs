@@ -437,8 +437,8 @@ namespace Server.Plugins.GameSession
 
                 _gameServerProcess = prc;
                 prc.Start();
-                prc.BeginErrorReadLine();
-                prc.BeginOutputReadLine();
+                //prc.BeginErrorReadLine();
+                //prc.BeginOutputReadLine();
 
 
             }
