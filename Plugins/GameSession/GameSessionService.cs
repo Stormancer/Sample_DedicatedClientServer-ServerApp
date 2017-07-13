@@ -79,7 +79,7 @@ namespace Server.Plugins.GameSession
             public TaskCompletionSource<Action<Stream, ISerializer>> GameCompleteTcs { get; private set; }
         }
         private ConcurrentDictionary<string, Client> _clients = new ConcurrentDictionary<string, Client>();
-        private ServerStatus _status;
+        private ServerStatus _status = ServerStatus.WaitingPlayers;
 
         private string _ip = "";
         private ushort _port;
@@ -242,7 +242,7 @@ namespace Server.Plugins.GameSession
             {
                 var peerGuid = new Guid(peer.UserData);
                 var serverGuid = new Guid(_serverGuid);
-                if(serverGuid == peerGuid)
+                if (serverGuid == peerGuid)
                 {
                     return;
                 }
@@ -286,7 +286,7 @@ namespace Server.Plugins.GameSession
         {
             _p2pToken = await _scene.DependencyResolver.Resolve<IPeerInfosService>().CreateP2pToken(peerId);
             _logger.Log(LogLevel.Trace, "gameserver", "Server responded as ready.", new { Port = _port });
-            _scene.Broadcast("server.started", new GameServerStartMessage {P2PToken = _p2pToken });
+            _scene.Broadcast("server.started", new GameServerStartMessage { P2PToken = _p2pToken });
             _status = ServerStatus.Started;
         }
 
@@ -313,7 +313,7 @@ namespace Server.Plugins.GameSession
                 throw new ClientException("You are not authenticated.");
             }
 
-            if (_p2pToken != null && user.Id != _config.hostUserId )
+            if (_p2pToken != null && user.Id != _config.hostUserId)
             {
                 peer.Send(p2pTokenRoute, _p2pToken);
             }
@@ -341,7 +341,7 @@ namespace Server.Plugins.GameSession
         {
             using (await _lock.LockAsync())
             {
-                if (_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) && _status == ServerStatus.WaitingPlayers)
+                if ((_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) || _config.Public) && _status == ServerStatus.WaitingPlayers)
                 {
                     _status = ServerStatus.Starting;
                     _logger.Log(LogLevel.Trace, "gamesession", "Starting game session.", new { });
@@ -440,11 +440,19 @@ namespace Server.Plugins.GameSession
                 prc.BeginErrorReadLine();
                 prc.BeginOutputReadLine();
 
-                
+
             }
-            catch (InvalidOperationException ex)
+            catch (Exception ex)
             {
-                _status = ServerStatus.Shutdown;
+                if (_config.canRestart)
+                {
+                    _status = ServerStatus.WaitingPlayers;
+                    await Reset();
+                }
+                else
+                {
+                    _status = ServerStatus.Shutdown;
+                }
                 _logger.Log(LogLevel.Error, "gameserver", "Failed to start server.", ex);
                 foreach (var client in _clients.Values)
                 {

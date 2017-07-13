@@ -26,7 +26,7 @@ namespace DedicatedSample
 
             if (shard == null)
             {
-                var metadata = Newtonsoft.Json.Linq.JObject.FromObject(new { gameSession = new Server.Plugins.GameSession.GameSessionConfiguration { Public = true } });
+                var metadata = Newtonsoft.Json.Linq.JObject.FromObject(new { gameSession = new Server.Plugins.GameSession.GameSessionConfiguration { Public = true, canRestart = true } });
 
                 var template = global::Server.App.GAMESESSION_TEMPLATE;
 
