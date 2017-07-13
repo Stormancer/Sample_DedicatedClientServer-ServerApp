@@ -412,6 +412,7 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
+                
                 //prc.OutputDataReceived += (sender, args) =>
                 //{
                 //    if (verbose)
