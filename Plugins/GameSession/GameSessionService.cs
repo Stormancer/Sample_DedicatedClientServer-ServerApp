@@ -346,6 +346,7 @@ namespace Server.Plugins.GameSession
                     _status = ServerStatus.Starting;
                     _logger.Log(LogLevel.Trace, "gamesession", "Starting game session.", new { });
                     await Start();
+                    _logger.Log(LogLevel.Trace, "gamesession", "Game session started.", new { });
                     var ctx = new GameSessionStartedCtx(_scene, _clients.Select(kvp => new Player(kvp.Value.Peer, kvp.Key)));
                     await _eventHandlers()?.RunEventHandler(eh => eh.GameSessionStarted(ctx), ex => _logger.Log(LogLevel.Error, "gameSession", "An error occured while running gameSession.Started event handlers", ex));
                 }
@@ -431,7 +432,13 @@ namespace Server.Plugins.GameSession
                     _status = ServerStatus.Shutdown;
                     foreach (var client in _clients.Values)
                     {
-                        client.Peer.Disconnect("Game server stopped");
+
+                        client.Peer?.Disconnect("Game server stopped");
+                    }
+                    if(_config.canRestart)
+                    {
+                        _status = ServerStatus.WaitingPlayers;
+                        Reset();
                     }
                 };
 
