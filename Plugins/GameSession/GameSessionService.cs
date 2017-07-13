@@ -411,7 +411,7 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
-
+                _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
                 //prc.OutputDataReceived += (sender, args) =>
                 //{
                 //    if (verbose)
@@ -435,7 +435,7 @@ namespace Server.Plugins.GameSession
 
                         client.Peer?.Disconnect("Game server stopped");
                     }
-                    if(_config.canRestart)
+                    if (_config.canRestart)
                     {
                         _status = ServerStatus.WaitingPlayers;
                         Reset();
