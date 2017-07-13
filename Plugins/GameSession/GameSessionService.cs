@@ -406,7 +406,7 @@ namespace Server.Plugins.GameSession
                 prc.StartInfo.Arguments = $"-port={_port} {(log ? "-log" : "")}";
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
-                //prc.StartInfo.UseShellExecute = false;
+                prc.StartInfo.UseShellExecute = false;
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
