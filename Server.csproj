@@ -148,6 +148,7 @@
     <Compile Include="Plugins\GameSession\App.cs" />
     <Compile Include="Plugins\GameSession\GameSessionPlugin.cs" />
     <Compile Include="Plugins\Management\ManagementPlugin.cs" />
+    <Compile Include="Plugins\Steam\App.cs" />
     <Compile Include="Plugins\Steam\ISteamService.cs" />
     <Compile Include="Plugins\Steam\Models\SteamAuthenticationResponse.cs" />
     <Compile Include="Plugins\Steam\Models\SteamPlayerSummary.cs" />
