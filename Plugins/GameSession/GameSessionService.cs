@@ -514,7 +514,7 @@ namespace Server.Plugins.GameSession
             }
 
 
-            if (!_scene.RemotePeers.Any())
+            if (!_clients.Values.Any(c => c.Status != PlayerStatus.Disconnected))
             {
                 if (_gameServerProcess != null && !_gameServerProcess.HasExited)
                 {
