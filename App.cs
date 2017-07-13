@@ -39,7 +39,7 @@ namespace Server
                 scene.AddGameSession();
             });
 
-            var userConfig = new Users.UserManagementConfig() { SceneIdRedirect = "services" /*Constants.MATCHMAKER_NAME*/ };
+            var userConfig = new Users.UserManagementConfig() { SceneIdRedirect = "locator" /*Constants.MATCHMAKER_NAME*/ };
             //userConfig.AuthenticationProviders.Add(new LoginPasswordAuthenticationProvider());
             userConfig.AuthenticationProviders.Add(new SteamAuthenticationProvider());
             //userConfig.AuthenticationProviders.Add(new AdminImpersonationAuthenticationProvider());
