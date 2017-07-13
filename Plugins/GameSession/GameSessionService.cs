@@ -405,25 +405,25 @@ namespace Server.Plugins.GameSession
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
                 prc.StartInfo.Arguments = $"-port={_port} {(log ? "-log" : "")}";
                 prc.StartInfo.FileName = path;
-                prc.StartInfo.CreateNoWindow = true;
-                prc.StartInfo.UseShellExecute = false;
-                prc.StartInfo.RedirectStandardOutput = true;
-                prc.StartInfo.RedirectStandardError = true;
+                prc.StartInfo.CreateNoWindow = false;
+                //prc.StartInfo.UseShellExecute = false;
+                //prc.StartInfo.RedirectStandardOutput = true;
+                //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
 
-                prc.OutputDataReceived += (sender, args) =>
-                {
-                    if (verbose)
-                    {
-                        _logger.Log(LogLevel.Trace, "gameserver", "Received data output from Intrepid server.", new { args.Data });
-                    }
+                //prc.OutputDataReceived += (sender, args) =>
+                //{
+                //    if (verbose)
+                //    {
+                //        _logger.Log(LogLevel.Trace, "gameserver", "Received data output from Intrepid server.", new { args.Data });
+                //    }
                    
 
-                };
-                prc.ErrorDataReceived += (sender, args) =>
-                  {
-                      _logger.Error("gameserver", $"An error occured while trying to start the game server : '{args.Data}'");
-                  };
+                //};
+                //prc.ErrorDataReceived += (sender, args) =>
+                //  {
+                //      _logger.Error("gameserver", $"An error occured while trying to start the game server : '{args.Data}'");
+                //  };
 
                 prc.Exited += (sender, args) =>
                 {
