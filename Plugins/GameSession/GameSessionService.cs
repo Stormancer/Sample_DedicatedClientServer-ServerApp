@@ -404,6 +404,7 @@ namespace Server.Plugins.GameSession
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
                 prc.StartInfo.Arguments = $"{(log ? "-log" : "")}"; //$"-port={_port} {(log ? "-log" : "")}";
+                prc.StartInfo.UseShellExecute = false;
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
                 //prc.StartInfo.UseShellExecute = false;
