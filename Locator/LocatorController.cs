@@ -30,15 +30,12 @@ namespace DedicatedSample
 
                 var template = global::Server.App.GAMESESSION_TEMPLATE;
 
-          
-
                 await client.CreateScene(
                     SHARD_ID,
                     template,
                     false,
                     metadata,
                     true);
-
             }
             var token = await client.CreateConnectionToken(SHARD_ID, "");
 

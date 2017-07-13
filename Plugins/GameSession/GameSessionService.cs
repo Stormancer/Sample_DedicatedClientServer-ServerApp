@@ -403,7 +403,7 @@ namespace Server.Plugins.GameSession
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
-                prc.StartInfo.Arguments =$"{(log ? "-log" : "")}" ;//$"-port={_port} {(log ? "-log" : "")}";
+                prc.StartInfo.Arguments = $"-port={_port} {(log ? " -log" : "")}";
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
                 //prc.StartInfo.UseShellExecute = false;
@@ -435,7 +435,6 @@ namespace Server.Plugins.GameSession
                 };
 
                 _gameServerProcess = prc;
-                _logger.Log(LogLevel.Trace, "gameserver", "Start command launch", new { });
                 prc.Start();
                 prc.BeginErrorReadLine();
                 prc.BeginOutputReadLine();
