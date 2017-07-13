@@ -404,23 +404,22 @@ namespace Server.Plugins.GameSession
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
                 prc.StartInfo.Arguments = $"{(log ? "-log" : "")}"; //$"-port={_port} {(log ? "-log" : "")}";
-                prc.StartInfo.UseShellExecute = false;
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
-                //prc.StartInfo.UseShellExecute = false;
-                //prc.StartInfo.RedirectStandardOutput = true;
-                //prc.StartInfo.RedirectStandardError = true;
+                prc.StartInfo.UseShellExecute = false;
+                prc.StartInfo.RedirectStandardOutput = true;
+                prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
 
-                //prc.OutputDataReceived += (sender, args) =>
-                //{
-                //    if (verbose)
-                //    {
-                //        _logger.Log(LogLevel.Trace, "gameserver", "Received data output from Intrepid server.", new { args.Data });
-                //    }
+                prc.OutputDataReceived += (sender, args) =>
+                {
+                    if (verbose)
+                    {
+                        _logger.Log(LogLevel.Trace, "gameserver", "Received data output from Intrepid server.", new { args.Data });
+                    }
 
 
-                //};
+                };
                 prc.ErrorDataReceived += (sender, args) =>
                   {
                       _logger.Error("gameserver", $"An error occured while trying to start the game server : '{args.Data}'");
