@@ -147,7 +147,19 @@ namespace Server.Plugins.GameSession
                 {
                     throw new ArgumentNullException("peer");
                 }
-                var user = await _sessions.GetUser(peer);
+                if (peer.ContentType == "application/octet-stream")
+                {
+                    var peerGuid = new Guid(peer.UserData);
+                    var serverGuid = new Guid(_serverGuid);
+                    if (serverGuid == peerGuid)
+                    {
+                        await SignalServerReady(peer.Id);
+                        return;
+                    }
+                    
+                }
+
+                    var user = await _sessions.GetUser(peer);
 
                 if (user == null)
                 {
@@ -246,6 +258,10 @@ namespace Server.Plugins.GameSession
                 {
                     return;
                 }
+                else
+                {
+                    throw new ClientException("Failed to authenticate as dedicated server");
+                }
             }
             if (peer == null)
             {
@@ -298,7 +314,7 @@ namespace Server.Plugins.GameSession
                 var serverGuid = new Guid(_serverGuid);
                 if (serverGuid == peerGuid)
                 {
-                    await SignalServerReady(peer.Id);
+                   
                     return;
                 }
             }
