@@ -49,7 +49,8 @@ namespace Server.Users
             var testConfig = environment.Configuration.auth?.test;
 
             _enabled = (bool?)testConfig?.enabled ?? false;
-            _blackList = testConfig?.blackList?.Select ?? new List<string>();
+           
+            _blackList = ((JValue)testConfig?.blackList)?.ToObject<List<string>>() ?? new List<string>();
 
         }
 
