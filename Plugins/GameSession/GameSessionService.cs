@@ -319,7 +319,7 @@ namespace Server.Plugins.GameSession
                 var serverGuid = new Guid(_serverGuid);
                 if (serverGuid == peerGuid)
                 {
-
+                    _serverPeer = peer;
                     return;
                 }
             }
@@ -357,6 +357,7 @@ namespace Server.Plugins.GameSession
 
         private AsyncLock _lock = new AsyncLock();
         private readonly ManagementClientAccessor _management;
+        private IScenePeerClient _serverPeer;
 
         public async Task TryStart()
         {
@@ -560,8 +561,15 @@ namespace Server.Plugins.GameSession
             {
                 if (_gameServerProcess != null && !_gameServerProcess.HasExited)
                 {
-                    _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { _scene.Id, Port = _port });
-                    _gameServerProcess.Close();
+                    _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { prcId = _gameServerProcess.Id });
+                    _serverPeer.Send("gameSession.shutdown", s => { }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                    //_gameServerProcess.Close();
+                    await Task.Delay(10000);
+                    if(!_gameServerProcess.HasExited)
+                    {
+                        _logger.Log(LogLevel.Error, "gameserver", $"Failed to close dedicated server. Killing it instead. The server should shutdown when receiving a message on the 'gameSession.shutdown' route.", new { prcId = _gameServerProcess.Id });
+                        _gameServerProcess.Kill();
+                    }
                     _gameServerProcess = null;
 
                 }
