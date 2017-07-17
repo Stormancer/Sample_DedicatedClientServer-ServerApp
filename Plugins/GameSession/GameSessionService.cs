@@ -560,7 +560,7 @@ namespace Server.Plugins.GameSession
             {
                 if (_gameServerProcess != null && !_gameServerProcess.HasExited)
                 {
-                    _logger.Log(LogLevel.Trace, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { _scene.Id, Port = _port });
+                    _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { _scene.Id, Port = _port });
                     _gameServerProcess.Close();
                     _gameServerProcess = null;
 
