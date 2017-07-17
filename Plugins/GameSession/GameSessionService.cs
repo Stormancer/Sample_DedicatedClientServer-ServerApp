@@ -156,10 +156,10 @@ namespace Server.Plugins.GameSession
                         await SignalServerReady(peer.Id);
                         return;
                     }
-                    
+
                 }
 
-                    var user = await _sessions.GetUser(peer);
+                var user = await _sessions.GetUser(peer);
 
                 if (user == null)
                 {
@@ -287,7 +287,12 @@ namespace Server.Plugins.GameSession
 
             if (!_clients.TryAdd(user.Id, client))
             {
-                throw new ClientException("Failed to add player to the game session.");
+                Client alreadyConnectedClient;
+                if (_clients.TryGetValue(user.Id, out alreadyConnectedClient) && alreadyConnectedClient.Status != PlayerStatus.Disconnected && !_clients.TryUpdate(user.Id, client, alreadyConnectedClient))
+                {
+                    throw new ClientException("Failed to add player to the game session.");
+                }
+
             }
 
             client.Status = PlayerStatus.Connected;
@@ -314,7 +319,7 @@ namespace Server.Plugins.GameSession
                 var serverGuid = new Guid(_serverGuid);
                 if (serverGuid == peerGuid)
                 {
-                   
+
                     return;
                 }
             }
@@ -428,8 +433,8 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
-                
-                
+
+
                 //prc.OutputDataReceived += (sender, args) =>
                 //{
                 //    if (verbose)
@@ -529,8 +534,11 @@ namespace Server.Plugins.GameSession
                     if (kvp.Value.Peer == peer)
                     {
                         userId = kvp.Key;
-                        client = kvp.Value;
 
+                        if (_config.Public)
+                        {
+                            _clients.TryRemove(userId, out client);
+                        }
                         // no need to continue searching for the client, we already found it
                         break;
                     }
@@ -539,6 +547,7 @@ namespace Server.Plugins.GameSession
 
             if (client != null)
             {
+
                 client.Peer = null;
                 client.Status = PlayerStatus.Disconnected;
 
