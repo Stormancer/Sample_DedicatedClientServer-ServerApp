@@ -50,7 +50,7 @@ namespace Server.Users
 
             _enabled = (bool?)testConfig?.enabled ?? false;
            
-            _blackList = ((JValue)testConfig?.blackList)?.ToObject<List<string>>() ?? new List<string>();
+            _blackList = ((JToken)testConfig?.blackList)?.ToObject<List<string>>() ?? new List<string>();
 
         }
 
