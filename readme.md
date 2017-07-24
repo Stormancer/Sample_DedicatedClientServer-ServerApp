@@ -10,22 +10,30 @@ This repository contains the Stormancer server app that goes with the DedicatedC
 
 The Client & server code of the sample hides connectivity establishment, including server port selection & negotiation.
 
+Usage
+=====
+Deploy this repository to a Stormancer server application and add the following json to the server config.
+
+Replace the `gameServer.executable` config value with a path to the dedicated server to start.
+
 Sample server configuration
 ===========================
 
     {
-	    "steam": {
-		  "apiKey": "0",
-		  "appId": 0,
-		  "usemockup": true,
-		  "vac": false
-	    },
-	    "index": "dedicated-sample",
-	    "gameSession": {
-	  	  "usep2p": true
-	    },
-	    "gameServer": {
-	  	  "log": true,
-	  	  "executable": "D:\\Intrepid\\20171207\\Sample_05_DedicatedClientServer.exe"
-	    }
+	"auth": {
+		"test": {
+			"enabled": true, //Use test login provider
+			"blackList": [
+				"badLogin"
+			]
+		}
+	},
+	"index": "dedicated-sample", //Index used to store use accounts.
+	"gameSession": {
+		"usep2p": true
+	},
+	"gameServer": {
+		"log": true,
+		"executable": "c:\\<path to dedicated server exe>"
+	  }
     }
