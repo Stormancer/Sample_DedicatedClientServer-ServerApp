@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Server.Management;
+using System.Diagnostics;
 
 namespace Server.Plugins.GameSession
 {
@@ -377,6 +378,7 @@ namespace Server.Plugins.GameSession
 
         private async Task Start()
         {
+            Debugger.Break();
             var serverEnabled = ((JToken)_configuration?.Settings?.gameServer) != null;
             var path = (string)_configuration.Settings?.gameServer?.executable;
             var verbose = ((bool?)_configuration.Settings?.gameServer?.verbose) ?? false;
