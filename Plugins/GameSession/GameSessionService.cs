@@ -482,6 +482,7 @@ namespace Server.Plugins.GameSession
             }
             catch (Exception ex)
             {
+                _logger.Log(LogLevel.Error, "gameserver", "Failed to start server.", ex);
                 if (_config.canRestart)
                 {
                     _status = ServerStatus.WaitingPlayers;
@@ -490,8 +491,7 @@ namespace Server.Plugins.GameSession
                 else
                 {
                     _status = ServerStatus.Shutdown;
-                }
-                _logger.Log(LogLevel.Error, "gameserver", "Failed to start server.", ex);
+                }              
                 foreach (var client in _clients.Values)
                 {
                     await client.Peer.Disconnect("Game server stopped");
