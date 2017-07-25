@@ -13,7 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Server.Management;
-//using System.Diagnostics;
+using System.Diagnostics;
 
 namespace Server.Plugins.GameSession
 {
@@ -378,7 +378,7 @@ namespace Server.Plugins.GameSession
 
         private async Task Start()
         {
-            //Debugger.Break();
+            Debugger.Break();
             var serverEnabled = ((JToken)_configuration?.Settings?.gameServer) != null;
             var path = (string)_configuration.Settings?.gameServer?.executable;
             var verbose = ((bool?)_configuration.Settings?.gameServer?.verbose) ?? false;
@@ -468,6 +468,7 @@ namespace Server.Plugins.GameSession
                     }
                 };
 
+                Debugger.Break();
                 _gameServerProcess = prc;
                 bool sucess = prc.Start();
 
@@ -481,7 +482,8 @@ namespace Server.Plugins.GameSession
 
             }
             catch (Exception ex)
-            {
+            {            
+                Debugger.Break();
                 _logger.Log(LogLevel.Error, "gameserver", "Failed to start server.", ex);
                 if (_config.canRestart)
                 {
