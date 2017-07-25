@@ -432,6 +432,7 @@ namespace Server.Plugins.GameSession
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
                 prc.StartInfo.UseShellExecute = false;
+                prc.EnableRaisingEvents = true;
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
