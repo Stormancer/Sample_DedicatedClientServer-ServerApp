@@ -453,6 +453,7 @@ namespace Server.Plugins.GameSession
 
                 prc.Exited += (sender, args) =>
                 {
+                    _p2pToken = null;
                     _logger.Error("gameserver", "Server stopped");
                     _status = ServerStatus.Shutdown;
                     foreach (var client in _clients.Values)
@@ -463,6 +464,7 @@ namespace Server.Plugins.GameSession
                     if (_config.canRestart)
                     {
                         _status = ServerStatus.WaitingPlayers;
+                        
                         Reset();
                     }
                 };
