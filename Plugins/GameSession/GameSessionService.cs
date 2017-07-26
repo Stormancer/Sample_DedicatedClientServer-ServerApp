@@ -334,11 +334,6 @@ namespace Server.Plugins.GameSession
                 throw new ClientException("You are not authenticated.");
             }
 
-            if (_p2pToken != null && user.Id != _config.hostUserId)
-            {
-                peer.Send(p2pTokenRoute, _p2pToken);
-            }
-
             foreach (var uId in _clients.Keys)
             {
                 if (uId != user.Id)
