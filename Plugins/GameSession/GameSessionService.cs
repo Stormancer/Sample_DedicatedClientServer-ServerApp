@@ -362,6 +362,7 @@ namespace Server.Plugins.GameSession
 
         public async Task TryStart()
         {
+            Debugger.Break();
             using (await _lock.LockAsync())
             {
                 if ((_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) || _config.Public) && _status == ServerStatus.WaitingPlayers)
