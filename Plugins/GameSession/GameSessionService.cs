@@ -421,15 +421,15 @@ namespace Server.Plugins.GameSession
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
-                prc.StartInfo.Arguments = token;// $"{ (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
+                prc.StartInfo.Arguments = $"{ (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
-                prc.StartInfo.UseShellExecute = true;
+                prc.StartInfo.UseShellExecute = false;
                 prc.EnableRaisingEvents = true;
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
-                //prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
-                //_logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
+                prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
+                _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
 
 
                 //prc.OutputDataReceived += (sender, args) =>
