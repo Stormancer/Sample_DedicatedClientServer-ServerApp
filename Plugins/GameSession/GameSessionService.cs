@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Server.Management;
+using System.Diagnostics;
 
 namespace Server.Plugins.GameSession
 {
@@ -356,6 +357,7 @@ namespace Server.Plugins.GameSession
 
         public async Task TryStart()
         {
+            Debugger.Break();
             using (await _lock.LockAsync())
             {
                 if ((_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) || _config.Public) && _status == ServerStatus.WaitingPlayers)
@@ -372,6 +374,7 @@ namespace Server.Plugins.GameSession
 
         private async Task Start()
         {
+            Debugger.Break();
             var serverEnabled = ((JToken)_configuration?.Settings?.gameServer) != null;
             var path = (string)_configuration.Settings?.gameServer?.executable;
             var verbose = ((bool?)_configuration.Settings?.gameServer?.verbose) ?? false;
@@ -416,7 +419,7 @@ namespace Server.Plugins.GameSession
                 }
 
                 var prc = new System.Diagnostics.Process();
-
+                Debugger.Break();
                 await LeaseServerPort();
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
@@ -463,7 +466,7 @@ namespace Server.Plugins.GameSession
                         Reset();
                     }
                 };
-
+                Debugger.Break();
                 _gameServerProcess = prc;
                 bool sucess = prc.Start();
 
