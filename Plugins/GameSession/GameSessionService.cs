@@ -436,7 +436,7 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
-                prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
+                //prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
                 // TODO 
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
 
