@@ -419,12 +419,16 @@ namespace Server.Plugins.GameSession
                 }
 
                 var prc = new System.Diagnostics.Process();
-                Debugger.Break();
+                Debugger.Break();            
                 await LeaseServerPort();
+                // TODO Get port
+
+
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
-                prc.StartInfo.Arguments = $"{ (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
+                prc.StartInfo.Arguments = $"-port={_port.ToString()} { (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
+                // TODO give port in arg to server
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
                 prc.StartInfo.UseShellExecute = false;
@@ -432,6 +436,8 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
+                prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
+                // TODO 
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
 
 
