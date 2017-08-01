@@ -357,7 +357,6 @@ namespace Server.Plugins.GameSession
 
         public async Task TryStart()
         {
-            Debugger.Break();
             using (await _lock.LockAsync())
             {
                 if ((_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) || _config.Public) && _status == ServerStatus.WaitingPlayers)
@@ -436,7 +435,7 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardOutput = true;
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
-                //prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
+                prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
                 // TODO 
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
 
