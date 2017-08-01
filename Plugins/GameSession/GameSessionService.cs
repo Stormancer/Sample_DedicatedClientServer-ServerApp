@@ -427,7 +427,7 @@ namespace Server.Plugins.GameSession
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
-                prc.StartInfo.Arguments = $"-port={_port.ToString()} { (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
+                prc.StartInfo.Arguments = $"PORT={_port.ToString()} { (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
                 // TODO give port in arg to server
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
