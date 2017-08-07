@@ -28,6 +28,7 @@ namespace Server.Users
         public void Build(HostPluginBuildContext ctx)
         {
             ctx.HostStarting += HostStarting;
+			ctx.HostStarted += HostStarted;
             ctx.HostDependenciesRegistration += RegisterDependencies;
 
         }
@@ -53,6 +54,19 @@ namespace Server.Users
             host.AddSceneTemplate("authenticator", AuthenticatorSceneFactory);
 
 
+        }
+		
+		private void HostStarted(IHost host)
+        {
+            var managementAccessor = host.DependencyResolver.Resolve<Management.ManagementClientAccessor>();
+            if(managementAccessor!=null)
+            {
+                managementAccessor.GetApplicationClient().ContinueWith(async t => {
+
+                    var client = await t;
+                    await client.CreateScene("authenticator", "authenticator");
+                });
+            }
         }
 
 

@@ -25,15 +25,6 @@ namespace Server
             builder.AddPlugin(new ConfigurationManagerPlugin());
           
 
-
-            
-
-            builder.SceneTemplate(LOCATOR_TEMPLATE, scene =>
-            {
-                scene.AddLocator();   
-
-            });
-
             builder.SceneTemplate(GAMESESSION_TEMPLATE, scene =>
             {
                 scene.AddGameSession();

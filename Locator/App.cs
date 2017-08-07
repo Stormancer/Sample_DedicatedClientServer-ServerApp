@@ -41,6 +41,32 @@ namespace DedicatedSample
                 }
                
             };
+			ctx.HostStarting += HostStarting;
+			ctx.HostStarted += HostStarted;
+        }
+		
+		 private void HostStarting(IHost host)
+        {
+            host.AddSceneTemplate("locator", scene=>{
+				
+                scene.AddLocator();   
+          
+			});
+
+
+        }
+		
+		private void HostStarted(IHost host)
+        {
+            var managementAccessor = host.DependencyResolver.Resolve<Management.ManagementClientAccessor>();
+            if(managementAccessor!=null)
+            {
+                managementAccessor.GetApplicationClient().ContinueWith(async t => {
+
+                    var client = await t;
+                    await client.CreateScene("locator", "authenticator");
+                });
+            }
         }
     }
 
