@@ -16,5 +16,5 @@ namespace Server.Plugins.GameSession
         /// </summary>
         public bool Public { get; set; }
         public bool canRestart { get;  set; }
-    }
+        public object UserData { get; set; } 
 }

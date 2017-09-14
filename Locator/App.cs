@@ -1,4 +1,5 @@
-﻿using Stormancer;
+﻿using Server.Management;
+using Stormancer;
 using Stormancer.Core;
 using Stormancer.Plugins;
 using Stormancer.Server;
@@ -58,13 +59,13 @@ namespace DedicatedSample
 		
 		private void HostStarted(IHost host)
         {
-            var managementAccessor = host.DependencyResolver.Resolve<Management.ManagementClientAccessor>();
+            var managementAccessor = host.DependencyResolver.Resolve<ManagementClientAccessor>();
             if(managementAccessor!=null)
             {
                 managementAccessor.GetApplicationClient().ContinueWith(async t => {
 
                     var client = await t;
-                    await client.CreateScene("locator", "authenticator");
+                    await client.CreateScene("locator", "locator");
                 });
             }
         }
