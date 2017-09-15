@@ -15,6 +15,7 @@ namespace Server.Plugins.GameSession
         /// True if anyone can connect to the game session.
         /// </summary>
         public bool Public { get; set; }
-        public bool canRestart { get;  set; }
-        public object UserData { get; set; } 
+        public bool canRestart { get; set; }
+        public object UserData { get; set; }
+    }
 }
