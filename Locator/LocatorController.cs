@@ -29,7 +29,7 @@ namespace DedicatedSample
             var client = await _management.GetApplicationClient();
             // Get data send by client
             var mapId = ctx.ReadObject<string>();
-            var shardId = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(mapId));
+            var shardId = StringToHex(mapId);
             var shard = await client.GetScene(shardId);
 
             if (shard == null)
@@ -50,6 +50,17 @@ namespace DedicatedSample
             var token = await client.CreateConnectionToken(shardId, "");
 
             ctx.SendValue(token);
+        }
+
+        private string StringToHex(string hexstring)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (char t in hexstring)
+            {
+                //Note: X for upper, x for lower case letters
+                sb.Append(Convert.ToInt32(t).ToString("x"));
+            }
+            return sb.ToString();
         }
     }
 }
