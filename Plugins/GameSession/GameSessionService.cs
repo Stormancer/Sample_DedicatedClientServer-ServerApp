@@ -13,7 +13,6 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Server.Management;
-using System.Diagnostics;
 
 namespace Server.Plugins.GameSession
 {
@@ -357,7 +356,6 @@ namespace Server.Plugins.GameSession
 
         public async Task TryStart()
         {
-            Debugger.Break();
             using (await _lock.LockAsync())
             {
                 if ((_config.userIds.All(id => _clients.Keys.Contains(id)) && _clients.Values.All(client => client.Status == PlayerStatus.Ready) || _config.Public) && _status == ServerStatus.WaitingPlayers)
@@ -374,7 +372,6 @@ namespace Server.Plugins.GameSession
 
         private async Task Start()
         {
-            Debugger.Break();
             var serverEnabled = ((JToken)_configuration?.Settings?.gameServer) != null;
             var path = (string)_configuration.Settings?.gameServer?.executable;
             var verbose = ((bool?)_configuration.Settings?.gameServer?.verbose) ?? false;
@@ -402,7 +399,7 @@ namespace Server.Plugins.GameSession
                     {
                         await LeaseServerPort();
 
-                        await Task.Delay(TimeSpan.FromSeconds(5));
+                        await Task.Delay(TimeSpan.FromSeconds(50));
 
                         _status = ServerStatus.Started;
                         var gameStartMessage = new GameServerStartMessage { P2PToken = null };
@@ -419,16 +416,11 @@ namespace Server.Plugins.GameSession
                 }
 
                 var prc = new System.Diagnostics.Process();
-                Debugger.Break();            
                 await LeaseServerPort();
-                // TODO Get port
-
-
                 var managementClient = await _management.GetApplicationClient();
                 _serverGuid = Guid.NewGuid().ToByteArray();
                 var token = await managementClient.CreateConnectionToken(_scene.Id, _serverGuid, "application/octet-stream");
                 prc.StartInfo.Arguments = $"PORT={_port.ToString()} { (log ? "-log" : "")}";//$"-port={_port} {(log ? "-log" : "")}";
-                // TODO give port in arg to server
                 prc.StartInfo.FileName = path;
                 prc.StartInfo.CreateNoWindow = false;
                 prc.StartInfo.UseShellExecute = false;
@@ -437,7 +429,9 @@ namespace Server.Plugins.GameSession
                 //prc.StartInfo.RedirectStandardError = true;
                 prc.StartInfo.EnvironmentVariables.Add("connectionToken", token);
                 prc.StartInfo.EnvironmentVariables.Add("P2Pport", _port.ToString());
-                // TODO 
+                var userData = _config.UserData?.ToString() ?? string.Empty;
+                var b64UserData = Convert.ToBase64String(Encoding.UTF8.GetBytes(userData));
+                prc.StartInfo.EnvironmentVariables.Add("userData", b64UserData);
                 _logger.Log(LogLevel.Debug, "gameserver", $"Starting server {prc.StartInfo.FileName} with args {prc.StartInfo.Arguments}", new { env = prc.StartInfo.EnvironmentVariables });
 
 
@@ -468,15 +462,14 @@ namespace Server.Plugins.GameSession
                     if (_config.canRestart)
                     {
                         _status = ServerStatus.WaitingPlayers;
-                        
+
                         Reset();
                     }
                 };
-                Debugger.Break();
                 _gameServerProcess = prc;
                 bool sucess = prc.Start();
 
-                if (sucess) 
+                if (sucess)
                     _logger.Log(LogLevel.Debug, "gameserver", "Starting process success ", "");
                 else
                     _logger.Log(LogLevel.Debug, "gameserver", "Starting process failed ", "");
@@ -486,7 +479,7 @@ namespace Server.Plugins.GameSession
 
             }
             catch (Exception ex)
-            {            
+            {
                 _logger.Log(LogLevel.Error, "gameserver", "Failed to start server.", ex);
                 if (_config.canRestart)
                 {
@@ -496,7 +489,7 @@ namespace Server.Plugins.GameSession
                 else
                 {
                     _status = ServerStatus.Shutdown;
-                }              
+                }
                 foreach (var client in _clients.Values)
                 {
                     await client.Peer.Disconnect("Game server stopped");
@@ -576,17 +569,17 @@ namespace Server.Plugins.GameSession
                     _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { prcId = _gameServerProcess.Id });
                     _serverPeer.Send("gameSession.shutdown", s => { }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
                     //_gameServerProcess.Close();
-                    await Task.Delay(10000);
-                    if(!_gameServerProcess.HasExited)
+                    var _ = Task.Delay(10000).ContinueWith(t =>
                     {
-                        _logger.Log(LogLevel.Error, "gameserver", $"Failed to close dedicated server. Killing it instead. The server should shutdown when receiving a message on the 'gameSession.shutdown' route.", new { prcId = _gameServerProcess.Id });
-                        _gameServerProcess.Kill();
-                    }
-                    _gameServerProcess = null;
-
+                        if (!_gameServerProcess.HasExited)
+                        {
+                            _logger.Log(LogLevel.Error, "gameserver", $"Failed to close dedicated server. Killing it instead. The server should shutdown when receiving a message on the 'gameSession.shutdown' route.", new { prcId = _gameServerProcess.Id });
+                            _gameServerProcess.Kill();
+                        }
+                        _gameServerProcess = null;
+                        _portLease?.Dispose();
+                    });
                 }
-                _portLease?.Dispose();
-
                 _logger.Log(LogLevel.Trace, "gameserver", $"Game server for scene {_scene.Id} shut down.", new { _scene.Id, Port = _port });
             }
 

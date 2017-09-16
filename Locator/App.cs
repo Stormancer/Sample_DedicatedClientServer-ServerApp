@@ -65,7 +65,7 @@ namespace DedicatedSample
                 managementAccessor.GetApplicationClient().ContinueWith(async t => {
 
                     var client = await t;
-                    await client.CreateScene("locator", "authenticator");
+                    await client.CreateScene("locator", "locator");
                 });
             }
         }

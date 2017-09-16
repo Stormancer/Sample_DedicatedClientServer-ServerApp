@@ -21,33 +21,34 @@ namespace Server.Plugins.GameSession
         public void Build(HostPluginBuildContext ctx)
         {
             ctx.SceneDependenciesRegistration += (IDependencyBuilder builder, ISceneHost scene) =>
-              {
-                  if (scene.Metadata.ContainsKey(METADATA_KEY))
-                  {
-                      builder.Register<GameSessionService>().As<IGameSessionService>().SingleInstance();
-                      builder.Register<GameSessionController>().InstancePerRequest();
-                  }
-              };
+            {
+                if (scene.Metadata.ContainsKey(METADATA_KEY))
+                {
+                    builder.Register<GameSessionService>().As<IGameSessionService>().SingleInstance();
+                    builder.Register<GameSessionController>().InstancePerRequest();
+                }
+            };
             ctx.HostStarted += (IHost host) =>
             {
 
             };
             ctx.SceneCreated += (ISceneHost scene) =>
-             {
-                 if (scene.Metadata.ContainsKey(METADATA_KEY))
-                 {
-                     scene.AddController<GameSessionController>();
-                     scene.Starting.Add(metadata =>
-                     {
+            {
+                if (scene.Metadata.ContainsKey(METADATA_KEY))
+                {
+                    scene.AddController<GameSessionController>();
 
-                         var service = scene.DependencyResolver.Resolve<IGameSessionService>();
-                         service.SetConfiguration(metadata);
+                    scene.Starting.Add(metadata =>
+                    {
 
-                         return Task.FromResult(true);
+                        var service = scene.DependencyResolver.Resolve<IGameSessionService>();
+                        service.SetConfiguration(metadata);
 
-                     });
-                 }
-             };
+                        return Task.FromResult(true);
+
+                    });
+                }
+            };
         }
     }
 }
