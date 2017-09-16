@@ -61,14 +61,14 @@
       <Private>True</Private>
     </Reference>
     <Reference Include="Stormancer.Core, Version=1.11.0.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Stormancer.Server.1.12.0\lib\Net45\Stormancer.Core.dll</HintPath>
+      <HintPath>packages\Stormancer.Core.1.11.0.1\lib\net45\Stormancer.Core.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="Stormancer.Management.Client">
       <HintPath>bin\Stormancer.Management.Client.dll</HintPath>
     </Reference>
     <Reference Include="Stormancer.Server, Version=1.12.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>packages\Stormancer.Server.1.12.0\lib\Net45\Stormancer.Server.dll</HintPath>
+      <HintPath>packages\Stormancer.Server.1.12.0.0\lib\net45\Stormancer.Server.dll</HintPath>
       <Private>True</Private>
     </Reference>
     <Reference Include="System" />

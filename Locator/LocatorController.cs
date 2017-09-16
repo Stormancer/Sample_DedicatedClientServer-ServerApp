@@ -28,26 +28,26 @@ namespace DedicatedSample
         {
             var client = await _management.GetApplicationClient();
             // Get data send by client
-            var shardID = ctx.ReadObject<string>();
-
-            var shard = await client.GetScene(shardID);
+            var mapId = ctx.ReadObject<string>();
+            var shardId = System.Convert.ToBase64String(System.Text.Encoding.UTF8.GetBytes(mapId));
+            var shard = await client.GetScene(shardId);
 
             if (shard == null)
             {
-                var metadata = Newtonsoft.Json.Linq.JObject.FromObject(new { gameSession = new Server.Plugins.GameSession.GameSessionConfiguration { Public = true, canRestart = true, UserData = shardID } });
+                var metadata = Newtonsoft.Json.Linq.JObject.FromObject(new { gameSession = new Server.Plugins.GameSession.GameSessionConfiguration { Public = true, canRestart = true, UserData = mapId } });
 
                 var template = global::Server.App.GAMESESSION_TEMPLATE;
 
-                _logger.Log(LogLevel.Trace, "LocatorController", "Shard ID call on getshard : ", shardID);
+                _logger.Log(LogLevel.Trace, "LocatorController", $"Creating scene {shardId} for map {mapId}", new { mapId, shardId });
 
                 await client.CreateScene(
-                    shardID,
+                    shardId,
                     template,
                     false,
                     metadata,
-                    true);
+                    false);
             }
-            var token = await client.CreateConnectionToken(shardID, "");
+            var token = await client.CreateConnectionToken(shardId, "");
 
             ctx.SendValue(token);
         }
