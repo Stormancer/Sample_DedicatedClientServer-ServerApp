@@ -13,6 +13,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Server.Management;
+using Server.Plugins.GameSession.Models;
 
 namespace Server.Plugins.GameSession
 {
@@ -107,27 +108,7 @@ namespace Server.Plugins.GameSession
 
             scene.Shuttingdown.Add(args =>
             {
-                _logger.Log(LogLevel.Trace, "gameserver", $"Shutting down gamesession scene {_scene.Id}.", new { _scene.Id, Port = _port });
-
-                try
-                {
-                    if (_gameServerProcess != null && !_gameServerProcess.HasExited)
-                    {
-                        _gameServerProcess.Close();
-                        _gameServerProcess = null;
-                    }
-                }
-                catch { }
-                finally
-                {
-                    _portLease?.Dispose();
-                }
-                _logger.Log(LogLevel.Trace, "gameserver", $"gamesession scene {_scene.Id} shut down.", new
-                {
-                    _scene.Id,
-                    Port = _port
-                });
-
+                CloseGameServerProcess();
                 return Task.FromResult(true);
             });
             scene.Connecting.Add(this.PeerConnecting);
@@ -353,6 +334,8 @@ namespace Server.Plugins.GameSession
         private AsyncLock _lock = new AsyncLock();
         private readonly ManagementClientAccessor _management;
         private IScenePeerClient _serverPeer;
+        private ShutdownMode _shutdownMode;
+        private DateTime _shutdownDate;
 
         public async Task TryStart()
         {
@@ -561,29 +544,36 @@ namespace Server.Plugins.GameSession
                 await EvaluateGameComplete();
             }
 
-
-            if (!_clients.Values.Any(c => c.Status != PlayerStatus.Disconnected))
+            if(_shutdownMode == ShutdownMode.NoPlayerLeft)
             {
-                if (_gameServerProcess != null && !_gameServerProcess.HasExited)
+                if (!_clients.Values.Any(c => c.Status != PlayerStatus.Disconnected))
                 {
-                    _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { prcId = _gameServerProcess.Id });
-                    _serverPeer.Send("gameSession.shutdown", s => { }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
-                    //_gameServerProcess.Close();
-                    var _ = Task.Delay(10000).ContinueWith(t =>
-                    {
-                        if (!_gameServerProcess.HasExited)
-                        {
-                            _logger.Log(LogLevel.Error, "gameserver", $"Failed to close dedicated server. Killing it instead. The server should shutdown when receiving a message on the 'gameSession.shutdown' route.", new { prcId = _gameServerProcess.Id });
-                            _gameServerProcess.Kill();
-                        }
-                        _gameServerProcess = null;
-                        _portLease?.Dispose();
-                    });
+                    CloseGameServerProcess();
                 }
-                _logger.Log(LogLevel.Trace, "gameserver", $"Game server for scene {_scene.Id} shut down.", new { _scene.Id, Port = _port });
             }
-
         }
+
+        private void CloseGameServerProcess()
+        {
+            if (_gameServerProcess != null && !_gameServerProcess.HasExited)
+            {
+                _logger.Log(LogLevel.Info, "gameserver", $"Closing down game server for scene {_scene.Id}.", new { prcId = _gameServerProcess.Id });
+                _serverPeer.Send("gameSession.shutdown", s => { }, PacketPriority.MEDIUM_PRIORITY, PacketReliability.RELIABLE);
+                //_gameServerProcess.Close();
+                var _ = Task.Delay(10000).ContinueWith(t =>
+                {
+                    if (!_gameServerProcess.HasExited)
+                    {
+                        _logger.Log(LogLevel.Error, "gameserver", $"Failed to close dedicated server. Killing it instead. The server should shutdown when receiving a message on the 'gameSession.shutdown' route.", new { prcId = _gameServerProcess.Id });
+                        _gameServerProcess.Kill();
+                    }
+                    _gameServerProcess = null;
+                    _portLease?.Dispose();
+                });
+            }
+            _logger.Log(LogLevel.Trace, "gameserver", $"Game server for scene {_scene.Id} shut down.", new { _scene.Id, Port = _port });
+        }
+
         public Task Reset()
         {
             foreach (var client in _clients.Values)
@@ -626,6 +616,20 @@ namespace Server.Plugins.GameSession
                     {
                         client.GameCompleteTcs.TrySetResult(ctx.ResultsWriter);
                     }
+                }
+            }
+        }
+
+        public async Task UpdateShutdownMode(ShutdownModeParameters shutdown, IScenePeerClient remotePeer)
+        {
+            if(remotePeer.Id == _serverPeer.Id)
+            {
+
+                if (shutdown.shutdownMode == ShutdownMode.SceneShutdown)
+                {
+                    _shutdownMode = shutdown.shutdownMode;
+                    _shutdownDate = await _scene.KeepAlive(new TimeSpan(0, 0, shutdown.keepSceneAliveFor));
+
                 }
             }
         }

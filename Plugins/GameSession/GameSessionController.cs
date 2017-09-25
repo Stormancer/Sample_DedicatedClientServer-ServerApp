@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Server.Plugins.GameSession.Models;
 
 namespace Server.Plugins.GameSession
 {
@@ -37,5 +38,10 @@ namespace Server.Plugins.GameSession
             return _service.Reset();
         }
 
+        public Task UpdateShutdownMode(RequestContext<IScenePeerClient> ctx)
+        {
+            ShutdownModeParameters shutdown = ctx.ReadObject<ShutdownModeParameters>();
+            return _service.UpdateShutdownMode(shutdown, ctx.RemotePeer);
+        }
     }
 }
